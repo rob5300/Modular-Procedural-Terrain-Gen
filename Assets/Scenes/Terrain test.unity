@@ -198,11 +198,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   type: 1
-  Frequency: 11.15
+  Frequency: 0
   dimensions: 2
   octaves: 1
   lacunarity: 2
   persistence: 0.5
+  MountainRaduis: 100
+  MountainPosition: {x: 0, y: 0}
 --- !u!1 &17933970
 GameObject:
   m_ObjectHideFlags: 0

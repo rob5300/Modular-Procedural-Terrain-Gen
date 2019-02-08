@@ -15,6 +15,8 @@ public class TerrainGenerator : MonoBehaviour {
     public float lacunarity = 2f;
     [Range(0f, 1f)]
     public float persistence = 0.5f;
+    public float MountainRaduis = 10f;
+    public Vector2 MountainPosition;
 
     private int Resolution;
     private Terrain terrain;
@@ -23,6 +25,7 @@ public class TerrainGenerator : MonoBehaviour {
     {
         terrain = GetComponent<Terrain>();
         Resolution = terrain.terrainData.heightmapResolution;
+        MountainPosition = new Vector2((float)Resolution / 2, (float)Resolution / 2);
     }
 
     public void Generate()
@@ -53,8 +56,24 @@ public class TerrainGenerator : MonoBehaviour {
                 terrainheights[y,x] = sample;
             }
         }
-
+        terrainheights = GenerateMountainAddativley(terrainheights);
         terrain.terrainData.SetHeightsDelayLOD(0, 0, terrainheights);
+    }
+
+    public float[,] GenerateMountainAddativley(float[,] heightdata)
+    {
+        for (int x = 0; x < Resolution; x++)
+        {
+            for (int y = 0; y < Resolution; y++)
+            {
+                float distance = Mathf.Abs(Vector2.Distance(new Vector2(y, x), MountainPosition));
+                if (distance > MountainRaduis) continue;
+                //We are in the mountain raduis, continue
+                float value = Color.Lerp(Color.white, Color.black, distance / MountainRaduis).grayscale;
+                if (value > heightdata[y, x]) heightdata[y, x] = value;
+            }
+        }
+        return heightdata;
     }
 
     public void SetFrequency(float value)
