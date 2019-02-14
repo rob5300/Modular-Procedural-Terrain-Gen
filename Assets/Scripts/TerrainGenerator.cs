@@ -17,6 +17,7 @@ public class TerrainGenerator : MonoBehaviour {
     public float persistence = 0.5f;
     public float MountainRaduis = 10f;
     public Vector2 MountainPosition;
+    public AnimationCurve MountainCurve;
 
     private int Resolution;
     private Terrain terrain;
@@ -69,7 +70,7 @@ public class TerrainGenerator : MonoBehaviour {
                 float distance = Mathf.Abs(Vector2.Distance(new Vector2(y, x), MountainPosition));
                 if (distance > MountainRaduis) continue;
                 //We are in the mountain raduis, continue
-                float value = Color.Lerp(Color.white, Color.black, distance / MountainRaduis).grayscale;
+                float value = MountainCurve.Evaluate(Mathf.Abs((distance / MountainRaduis) - 0.5f));
                 if (value > heightdata[y, x]) heightdata[y, x] = value;
             }
         }
@@ -92,4 +93,5 @@ public class TerrainGenerator : MonoBehaviour {
     {
         terrain.ApplyDelayedHeightmapModification();
     }
+
 }
