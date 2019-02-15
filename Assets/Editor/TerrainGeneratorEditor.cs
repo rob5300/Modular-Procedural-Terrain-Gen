@@ -14,6 +14,6 @@ public class TerrainGeneratorEditor : Editor
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
-        if (GUILayout.Button("Generate")) { t.Generate(); }
+        if (GUILayout.Button("Generate")) { t.Generate(); t.CalcLOD(); }
     }
 }

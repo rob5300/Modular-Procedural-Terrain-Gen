@@ -16,6 +16,10 @@ public class TerrainGenerator : MonoBehaviour {
     [Range(0f, 1f)]
     public float persistence = 0.5f;
     public float MountainRaduis = 10f;
+    [Range(0.1f, 1)]
+    public float NoiseScale = 0.5f;
+    [Range(0.1f, 1)]
+    public float MountainScale = 0.5f;
     public Vector2 MountainPosition;
     public AnimationCurve MountainCurve;
 
@@ -54,7 +58,7 @@ public class TerrainGenerator : MonoBehaviour {
                 {
                     sample = sample * 0.5f + 0.5f;
                 }
-                terrainheights[y,x] = sample;
+                terrainheights[y,x] = sample * NoiseScale;
             }
         }
         terrainheights = GenerateMountainAddativley(terrainheights);
@@ -70,7 +74,7 @@ public class TerrainGenerator : MonoBehaviour {
                 float distance = Mathf.Abs(Vector2.Distance(new Vector2(y, x), MountainPosition));
                 if (distance > MountainRaduis) continue;
                 //We are in the mountain raduis, continue
-                float value = MountainCurve.Evaluate(Mathf.Abs((distance / MountainRaduis) - 0.5f));
+                float value = MountainCurve.Evaluate(Mathf.Abs((distance / MountainRaduis) - 1)) * MountainScale;
                 if (value > heightdata[y, x]) heightdata[y, x] = value;
             }
         }
@@ -86,6 +90,24 @@ public class TerrainGenerator : MonoBehaviour {
     public void SetOctaves(float value)
     {
         octaves = (int)value;
+        Generate();
+    }
+
+    public void SetMountainRaduis(float value)
+    {
+        MountainRaduis = value;
+        Generate();
+    }
+
+    public void SetMountainScale(float value)
+    {
+        MountainScale = value;
+        Generate();
+    }
+
+    public void SetNoiseScale(float value)
+    {
+        NoiseScale = value;
         Generate();
     }
 
