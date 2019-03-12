@@ -34,8 +34,8 @@ public class VoxelTerrainGenerator : MonoBehaviour {
 
     private void Awake()
     {
-        MountainPosition = new Vector2((float)Resolution / 2, (float)Resolution / 2);
         Resolution = width;
+        MountainPosition = new Vector2((float)Resolution / 2, (float)Resolution / 2);
     }
 
     public void Start()

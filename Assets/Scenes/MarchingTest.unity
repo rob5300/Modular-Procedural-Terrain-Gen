@@ -289,7 +289,7 @@ MonoBehaviour:
   octaves: 1
   lacunarity: 4
   persistence: 1
-  MountainRaduis: 50
+  MountainRaduis: 250
   NoiseScale: 0.248
   MountainScale: 1
   MountainPosition: {x: 50, y: 50}
@@ -306,22 +306,13 @@ MonoBehaviour:
       inWeight: 0.33333334
       outWeight: 0.09202751
     - serializedVersion: 3
-      time: 0.9188559
-      value: 0.6706683
-      inSlope: 1.9747226
-      outSlope: 1.1636171
-      tangentMode: 1
-      weightedMode: 0
-      inWeight: 0.042187434
-      outWeight: 0.834802
-    - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 2
+      inSlope: 3.5184882
       outSlope: 2
-      tangentMode: 0
+      tangentMode: 1
       weightedMode: 0
-      inWeight: 0.33333334
+      inWeight: 0.025469184
       outWeight: 0.33333334
     m_PreInfinity: 2
     m_PostInfinity: 2
