@@ -33,7 +33,6 @@ namespace Assets.Scripts.CombinedTerrainGeneration.GenerationMethods
                 for (int x = 0; x < startData.Width; x++)
                 {
                     Vector3 point = Vector3.Lerp(point0, point1, (x + 0.5f) * stepSize);
-                    //_texture.SetPixel(x, y, new Color(point.x, point.y, point.z));
                     float sample = Noise.Sum(method, point, Frequency, octaves, lacunarity, persistence);
                     
                     sample = sample * 0.5f + 0.5f;
@@ -48,7 +47,8 @@ namespace Assets.Scripts.CombinedTerrainGeneration.GenerationMethods
                     for (int z = 0; z < startData.Length; z++)
                     {
                         float heightValue = terrainheights[x, z] * (startData.Height - 1);
-                        startData.SetData(x,y,z, y < heightValue ? 1 : 0);
+                        //Only set the value as 1, do not set otherwise to avoid overriding.
+                        if (y < heightValue) startData.SetData(x,y,z, 1);
                     }
                 }
             }

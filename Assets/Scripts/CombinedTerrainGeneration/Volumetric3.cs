@@ -10,34 +10,34 @@ namespace Assets.Scripts.CombinedTerrainGeneration
         public int Width { get; private set; }
         public int Height { get; private set; }
         public int Length { get; private set; }
-        private float[] _voxels;
+        public float[] Voxels;
 
         public Volumetric3(int length, int width, int height)
         {
             Width = width;
             Length = length;
             Height = height;
-            _voxels = new float[Width * Height * Length];
+            Voxels = new float[Width * Height * Length];
             InitializeArray();
         }
 
         protected virtual void InitializeArray()
         {
-            for (int i = 0; i < _voxels.Length; i++)
+            for (int i = 0; i < Voxels.Length; i++)
             {
-                _voxels[i] = 0;
+                Voxels[i] = 0;
             }
         }
 
         public float GetData(int x, int y, int z)
         {
             int idx = x + y * Width + z * Width * Height;
-            return _voxels[idx];
+            return Voxels[idx];
         }
 
         public void SetData(int x, int y, int z, float value)
         {
-            _voxels[x + y * Width + z * Width * Height] = value;
+            Voxels[x + y * Width + z * Width * Height] = value;
         }
     }
 }
