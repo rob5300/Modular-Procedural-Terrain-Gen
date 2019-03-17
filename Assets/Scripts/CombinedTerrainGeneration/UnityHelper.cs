@@ -12,7 +12,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration
         public void Update()
         {
             Action action;
-            if (UnityTasks.Count > 0 && !UnityTasks.TryDequeue(out action))
+            if (UnityTasks.Count > 0 && UnityTasks.TryDequeue(out action))
             {
                 action.Invoke();
             }

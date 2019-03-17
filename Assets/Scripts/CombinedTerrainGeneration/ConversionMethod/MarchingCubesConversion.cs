@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets.Scripts.CombinedTerrainGeneration
@@ -35,7 +34,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration
             //The mesh produced is not optimal. There is one vert for each index.
             //Would need to weld vertices for better quality mesh.
             marching.Generate(data.Voxels, _width, _height, _length, verts, indices);
-
+            Converted = true;
         }
 
         public override void Display()

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Scripts.CombinedTerrainGeneration.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,11 +9,16 @@ namespace Assets.Scripts.CombinedTerrainGeneration.GenerationMethods
 {
     public class PerlinNoiseGeneration : GenerationMethod
     {
+        [Configurable]
         public float Frequency = 1f;
-        public int octaves = 1;
-        public float lacunarity = 2f;
-        public float persistence = 0.5f;
-        public float NoiseScale = 0.5f;
+        [Configurable]
+        public int Octaves = 1;
+        [Configurable]
+        public float Lacunarity = 2f;
+        [Configurable]
+        public float Persistence = 0.5f;
+        [Configurable]
+        public float Scale = 0.5f;
 
         public override Volumetric3 Generate(Volumetric3 startData)
         {
@@ -33,10 +39,10 @@ namespace Assets.Scripts.CombinedTerrainGeneration.GenerationMethods
                 for (int x = 0; x < startData.Width; x++)
                 {
                     Vector3 point = Vector3.Lerp(point0, point1, (x + 0.5f) * stepSize);
-                    float sample = Noise.Sum(method, point, Frequency, octaves, lacunarity, persistence);
+                    float sample = Noise.Sum(method, point, Frequency, Octaves, Lacunarity, Persistence);
                     
                     sample = sample * 0.5f + 0.5f;
-                    terrainheights[y, x] = sample * NoiseScale;
+                    terrainheights[y, x] = sample * Scale;
                 }
             }
 
