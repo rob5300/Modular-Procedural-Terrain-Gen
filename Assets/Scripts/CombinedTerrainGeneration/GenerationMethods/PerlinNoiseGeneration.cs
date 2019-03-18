@@ -10,6 +10,8 @@ namespace Assets.Scripts.CombinedTerrainGeneration.GenerationMethods
     public class PerlinNoiseGeneration : GenerationMethod
     {
         [Configurable]
+        public bool Additive = false;
+        [Configurable]
         public float Frequency = 1f;
         [Configurable]
         public int Octaves = 1;
@@ -48,18 +50,38 @@ namespace Assets.Scripts.CombinedTerrainGeneration.GenerationMethods
 
             for (int x = 0; x < startData.Width; x++)
             {
-                for (int y = 0; y < startData.Height; y++)
+                for (int z = 0; z < startData.Length; z++)
                 {
-                    for (int z = 0; z < startData.Length; z++)
+                    float endPoint = 0;
+                    float heightExtra = 0;
+                    if (Additive)
                     {
-                        float heightValue = terrainheights[x, z] * (startData.Height - 1);
-                        //Only set the value as 1, do not set otherwise to avoid overriding.
-                        if (y < heightValue) startData.SetData(x,y,z, 1);
+                        //We are in additive mode, we add our data only on top of the highest data points instead.
+                        float highestPoint = GetHighestYPoint(startData, x, z);
+                        endPoint = highestPoint;
+                        heightExtra = highestPoint;
+                    }
+                    for (int y = 0; y < startData.Height; y++)
+                    {
+                        float heightValue = terrainheights[x, z] * (startData.Height - 1) + heightExtra;
+                        
+                        //Only set the value as 1 within the range we wish to modify.
+                        if (y < heightValue && y >= endPoint) startData.SetData(x,y,z, 1);
                     }
                 }
             }
 
             return startData;
+        }
+        
+        private int GetHighestYPoint(Volumetric3 data, int x, int z)
+        {
+            int y;
+            for (y = data.Height - 1; z >= 0; y--)
+            {
+                if (data.GetData(x, y, z) == 1) return y;
+            }
+            return y;
         }
     }
 }

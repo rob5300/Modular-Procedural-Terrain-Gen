@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Assets.Scripts.CombinedTerrainGeneration
 {
@@ -11,6 +9,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration
 
         public List<GenerationMethod> MethodList;
         public ConversionMethod ConversionMethod;
+        public HashSet<GameObject> TerrainObjects;
 
         public int Length { get; private set; }
         public int Width { get; private set; }
@@ -26,6 +25,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration
             Width = width;
             Height = height;
             MethodList = new List<GenerationMethod>();
+            TerrainObjects = new HashSet<GameObject>();
         }
 
         public ResultData Generate()
@@ -81,7 +81,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration
         {
             if (ConversionMethod.Converted)
             {
-                ConversionMethod.Display();
+                ConversionMethod.Display(TerrainObjects);
             }
             Status = "Done (Idle)";
         }

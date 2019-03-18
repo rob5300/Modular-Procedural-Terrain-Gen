@@ -25,12 +25,10 @@ namespace Assets.Scripts.CombinedTerrainGeneration
 
         private bool _isRunning = false;
 
-        public void Start()
+        public void Awake()
         {
             _generator = new GeneratorSystem(helper, Length, Width, Height);
             _configManager = new GeneratorConfigManager();
-            _generator.MethodList.Add(new PerlinNoiseGeneration());
-            _generator.ConversionMethod = new MarchingCubesConversion();
         }
 
         public void AddMethod(Method method)
@@ -39,7 +37,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration
             {
                 if (method is ConversionMethod) _generator.ConversionMethod = (ConversionMethod)method;
                 else if (method is GenerationMethod) _generator.MethodList.Add((GenerationMethod)method);
-                else ResultText.text = "Method invalid.";
+                else ResultText.text = "Method object type is invalid.";
             }
         }
 
@@ -62,17 +60,28 @@ namespace Assets.Scripts.CombinedTerrainGeneration
             //Get the entered data for each method and attempt to apply the values via reflection
             for (int i = 0; i < _generator.MethodList.Count; i++)
             {
-                UIManager.GetDataFromPairs(i)
+                _configManager.ApplyConfigurableValuesTo(_generator.MethodList[i], UIManager.GetDataFromPairs(i));
             }
+            //Get the entered data for the conversion method and also apply that data
+            _configManager.ApplyConfigurableValuesTo(_generator.ConversionMethod, UIManager.GetDataFromPairsOnConversionMethod());
 
             Func<ResultData> generateFunc= () => { return _generator.Generate(); };
             _generateTask = Task.Run(generateFunc);
             _isRunning = true;
         }
 
-        public List<string> GetConfigList(Type type)
+        public List<ConfigurableField> GetConfigList(Type type)
         {
             return _configManager.GetConfigList(type);
+        }
+
+        private void CleanOldObjects()
+        {
+            foreach(GameObject ob in _generator.TerrainObjects)
+            {
+                Destroy(ob);
+            }
+            _generator.TerrainObjects.Clear();
         }
     }
 }

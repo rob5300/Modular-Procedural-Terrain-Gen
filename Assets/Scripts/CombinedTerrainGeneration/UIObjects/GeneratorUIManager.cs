@@ -10,14 +10,22 @@ public class GeneratorUIManager : MonoBehaviour {
 
     public GenerationInstance GenerationInst;
 
+    [Header("Method Objects")]
     public Transform MethodContentArea;
     public MethodBox MethodDataBoxInstance;
     public Dropdown MethodsDropdown;
-    public Dropdown ConversionMethodsDropdown;
     public RectTransform AddNewBox;
+    [Header("Conversion Method Objects")]
+    public Transform ConvertMethodContentArea;
+    public Dropdown ConversionMethodsDropdown;
+    public MethodBox ConversionMethodBoxInstance;
 
-    private List<List<MethodDataPair>> DataPairs = new List<List<MethodDataPair>>();
+    private List<List<MethodDataPair>> _dataPairs = new List<List<MethodDataPair>>();
+    private List<MethodDataPair> _converterDataPairs = new List<MethodDataPair>();
     private int _currentIndex = 0;
+
+    private int _currentConvertMethodSelected = -1;
+    private GameObject _currentConvertMethodBox;
 
     private Type[] Methods =
     {
@@ -41,6 +49,26 @@ public class GeneratorUIManager : MonoBehaviour {
                 Debug.LogError("No Generation Instance found.");
             }
         }
+
+        //Populate the dropdown for normal methods
+        List<Dropdown.OptionData> methodDropdownData = new List<Dropdown.OptionData>();
+        foreach(Type type in Methods)
+        {
+            methodDropdownData.Add(new Dropdown.OptionData(type.Name));
+        }
+        MethodsDropdown.AddOptions(methodDropdownData);
+
+
+        //Populate the dropdown for conversion methods
+        List<Dropdown.OptionData> cmethodDropdownData = new List<Dropdown.OptionData>();
+        foreach (Type type in ConversionMethods)
+        {
+            cmethodDropdownData.Add(new Dropdown.OptionData(type.Name));
+        }
+        ConversionMethodsDropdown.AddOptions(cmethodDropdownData);
+
+        //Set the first conversion method as the current conversion method by default
+        ConvertMethodChange(0);
     }
 
     public void AddNewMethod()
@@ -55,6 +83,29 @@ public class GeneratorUIManager : MonoBehaviour {
         AddNewBox.SetAsLastSibling();
     }
 
+    public void ConvertMethodChange(int index)
+    {
+        if(index != _currentConvertMethodSelected)
+        {
+            GenerationInst.AddMethod(Activator.CreateInstance(ConversionMethods[index]) as ConversionMethod);
+            UpdateConvertMethodUI(index);
+            _currentConvertMethodSelected = index;
+        }
+    }
+
+    private void UpdateConvertMethodUI(int index)
+    {
+        if (_currentConvertMethodBox != null) Destroy(_currentConvertMethodBox);
+        //Make a new ui box for this method and populate it with the correct data.
+        GameObject newBox = Instantiate(ConversionMethodBoxInstance.gameObject, ConvertMethodContentArea);
+        MethodBox box = newBox.GetComponent<MethodBox>();
+        box.Title.text = ConversionMethods[index].Name;
+        box.Index = index;
+        newBox.SetActive(true);
+        _currentConvertMethodBox = box.gameObject;
+        MakeDataPairs(ConversionMethods[index], box, true);
+    }
+
     private void AddMethodToUI(Type method)
     {
         //Add new method box
@@ -67,31 +118,93 @@ public class GeneratorUIManager : MonoBehaviour {
         _currentIndex++;
     }
 
-    private void MakeDataPairs(Type method, MethodBox box)
+    private void MakeDataPairs(Type method, MethodBox box, bool conversionMethod = false)
     {
         //Get a list of the configurable values
-        List<string> values = GenerationInst.GetConfigList(method);
-        DataPairs.Add(new List<MethodDataPair>());
-        List<MethodDataPair> pairs = DataPairs[_currentIndex];
-        foreach (string str in values)
+        List<ConfigurableField> values = GenerationInst.GetConfigList(method);
+
+        //If we have any values to display.
+        if (values != null)
         {
-            GameObject newVal = Instantiate<GameObject>(box.DataPairObject.gameObject, box.DataPanel);
-            MethodDataPair dataPair = newVal.GetComponent<MethodDataPair>();
-            dataPair.Name.text = str + ":";
-            dataPair.key = str;
-            pairs.Add(dataPair);
-            dataPair.gameObject.SetActive(true);
+            List<MethodDataPair> pairs;
+            if (!conversionMethod)
+            {
+                _dataPairs.Add(new List<MethodDataPair>());
+                pairs = _dataPairs[_currentIndex];
+            }
+            else
+            {
+                _converterDataPairs.Clear();
+                pairs = _converterDataPairs;
+            }
+            foreach (ConfigurableField field in values)
+            {
+                GameObject newVal = Instantiate(box.DataPairObject.gameObject, box.DataPanel);
+                MethodDataPair dataPair = newVal.GetComponent<MethodDataPair>();
+                dataPair.Name.text = field.Name + ":";
+                dataPair.FieldData = field;
+                if(field.ValueType == ConfigurableField.Type.BOOLEAN)
+                {
+                    //Field is a boolean.
+                    dataPair.EnableToggle();
+                    dataPair.Toggle.isOn = field.BoolValue;
+                }
+                else
+                {
+                    //field is any other type.
+                    dataPair.Input.text = field.StringValue;
+                    SetTextInputToType(dataPair.Input, field.ValueType);
+                }
+                pairs.Add(dataPair);
+                dataPair.gameObject.SetActive(true);
+            } 
         }
         box.FitContent();
     }
 
-    public Dictionary<string, string> GetDataFromPairs(int index)
+    public List<ConfigurableField> GetDataFromPairs(int index)
     {
-        Dictionary<string, string> dataPairs = new Dictionary<string, string>();
-        foreach(MethodDataPair dPair in DataPairs[index])
+        List<ConfigurableField> dataPairs = new List<ConfigurableField>();
+        foreach(MethodDataPair dPair in _dataPairs[index])
         {
-            dataPairs.Add(dPair.key, dPair.Input.text);
+            //Update the string or boolean value using the input fields value.
+            if (dPair.FieldData.ValueType == ConfigurableField.Type.BOOLEAN)
+            {
+                dPair.FieldData.BoolValue = dPair.Toggle.isOn;
+            }
+            else
+            {
+                dPair.FieldData.StringValue = dPair.Input.text;
+            }
+            dataPairs.Add(dPair.FieldData);
         }
         return dataPairs;
+    }
+
+    public List<ConfigurableField> GetDataFromPairsOnConversionMethod()
+    {
+        List<ConfigurableField> dataPairs = new List<ConfigurableField>();
+        foreach (MethodDataPair dPair in _converterDataPairs)
+        {
+            dataPairs.Add(dPair.FieldData);
+        }
+        return dataPairs;
+    }
+
+    private void SetTextInputToType(InputField inputField, ConfigurableField.Type type)
+    {
+        switch (type)
+        {
+            case ConfigurableField.Type.FLOAT:
+                inputField.contentType = InputField.ContentType.DecimalNumber;
+                return;
+            case ConfigurableField.Type.INT:
+                inputField.contentType = InputField.ContentType.IntegerNumber;
+                return;
+            case ConfigurableField.Type.STRING:
+            default:
+                inputField.contentType = InputField.ContentType.Standard;
+                return;
+        }
     }
 }
