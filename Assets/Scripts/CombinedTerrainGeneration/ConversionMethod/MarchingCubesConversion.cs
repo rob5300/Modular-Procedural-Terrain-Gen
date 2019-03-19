@@ -12,6 +12,12 @@ namespace Assets.Scripts.CombinedTerrainGeneration
     {
         [Configurable]
         public float Surface = 0f;
+        [Configurable]
+        public float PosX = 115;
+        [Configurable]
+        public float PosY = -115;
+        [Configurable]
+        public float PosZ = -115;
 
         Marching marching = new MarchingCubes();
         List<Vector3> verts = new List<Vector3>();
@@ -38,7 +44,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration
             Converted = true;
         }
 
-        public override void Display(HashSet<GameObject> objects)
+        public override void Display(HashSet<GameObject> objects, Transform target)
         {
             int maxVertsPerMesh = 30000; //must be divisible by 3, ie 3 verts == 1 triangle
             int numMeshes = verts.Count / maxVertsPerMesh + 1;
@@ -70,13 +76,14 @@ namespace Assets.Scripts.CombinedTerrainGeneration
                 mesh.RecalculateNormals();
 
                 GameObject go = new GameObject("Mesh");
+                go.transform.parent = target;
                 go.AddComponent<MeshFilter>();
                 go.AddComponent<MeshRenderer>();
                 go.GetComponent<Renderer>().material = mat;
                 go.GetComponent<MeshFilter>().mesh = mesh;
                 objects.Add(go);
 
-                go.transform.localPosition = new Vector3(-_width / 2, -_height / 2, -_length / 2);
+                go.transform.localPosition = new Vector3(PosX, PosY, PosZ);
             }
         }
     }

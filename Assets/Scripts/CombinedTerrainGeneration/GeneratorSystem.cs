@@ -17,6 +17,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration
 
         private UnityHelper _helper;
         private Volumetric3 _data;
+        private Transform _target;
 
         public GeneratorSystem(UnityHelper helper, int length, int width, int height)
         {
@@ -28,10 +29,11 @@ namespace Assets.Scripts.CombinedTerrainGeneration
             TerrainObjects = new HashSet<GameObject>();
         }
 
-        public ResultData Generate()
+        public ResultData Generate(Transform target)
         {
             ResultData result;
             Status = "Generating";
+            _target = target;
 
             //Generate a new set of data.
             _data = new Volumetric3(Length, Width, Height);
@@ -81,7 +83,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration
         {
             if (ConversionMethod.Converted)
             {
-                ConversionMethod.Display(TerrainObjects);
+                ConversionMethod.Display(TerrainObjects, _target);
             }
             Status = "Done (Idle)";
         }

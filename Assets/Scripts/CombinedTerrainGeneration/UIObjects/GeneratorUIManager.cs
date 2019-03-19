@@ -29,7 +29,9 @@ public class GeneratorUIManager : MonoBehaviour {
 
     private Type[] Methods =
     {
-        typeof(PerlinNoiseGeneration)
+        typeof(PerlinNoiseGeneration),
+        typeof(SolidGeneration),
+        typeof(CaveGeneration)
     };
 
     private Type[] ConversionMethods =
@@ -90,6 +92,7 @@ public class GeneratorUIManager : MonoBehaviour {
             GenerationInst.AddMethod(Activator.CreateInstance(ConversionMethods[index]) as ConversionMethod);
             UpdateConvertMethodUI(index);
             _currentConvertMethodSelected = index;
+            Invoke("RefitConvertUI", 0.1f);
         }
     }
 
@@ -206,5 +209,10 @@ public class GeneratorUIManager : MonoBehaviour {
                 inputField.contentType = InputField.ContentType.Standard;
                 return;
         }
+    }
+
+    private void RefitConvertUI()
+    {
+        _currentConvertMethodBox.GetComponent<MethodBox>().FitContent();
     }
 }

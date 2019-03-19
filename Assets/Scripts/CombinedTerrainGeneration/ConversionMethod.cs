@@ -12,7 +12,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration
 
         public abstract void Convert(Volumetric3 data);
 
-        public abstract void Display(HashSet<GameObject> createdObjects);
+        public abstract void Display(HashSet<GameObject> createdObjects, Transform target);
 
     }
 }

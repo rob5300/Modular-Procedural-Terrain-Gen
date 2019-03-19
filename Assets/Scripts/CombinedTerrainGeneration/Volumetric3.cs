@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 
 namespace Assets.Scripts.CombinedTerrainGeneration
 {
@@ -38,6 +39,12 @@ namespace Assets.Scripts.CombinedTerrainGeneration
         public void SetData(int x, int y, int z, float value)
         {
             Voxels[x + y * Width + z * Width * Height] = value;
+        }
+
+        public bool InBounds(Vector3Int position)
+        {
+            if (position.x < 0 || position.y < 0 || position.x < 0 || position.x >= Width || position.y >= Height || position.z >= Length) return false;
+            return true;
         }
     }
 }

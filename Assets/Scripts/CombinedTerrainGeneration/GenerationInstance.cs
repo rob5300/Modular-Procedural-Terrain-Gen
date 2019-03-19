@@ -18,6 +18,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration
 
         public UnityHelper helper;
         public GeneratorUIManager UIManager;
+        public Transform GenerateTarget;
 
         private GeneratorSystem _generator;
         private GeneratorConfigManager _configManager;
@@ -65,7 +66,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration
             //Get the entered data for the conversion method and also apply that data
             _configManager.ApplyConfigurableValuesTo(_generator.ConversionMethod, UIManager.GetDataFromPairsOnConversionMethod());
 
-            Func<ResultData> generateFunc= () => { return _generator.Generate(); };
+            Func<ResultData> generateFunc= () => { return _generator.Generate(GenerateTarget); };
             _generateTask = Task.Run(generateFunc);
             _isRunning = true;
         }
