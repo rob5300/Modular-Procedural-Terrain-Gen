@@ -48,6 +48,10 @@ namespace Assets.Scripts.CombinedTerrainGeneration
                 {
                     result = Display();
                 }
+                else
+                {
+                    Status = "Idle from Error";
+                }
             }
             else
             {
@@ -62,8 +66,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration
             Status = "Converting";
             if(ConversionMethod != null)
             {
-                ConversionMethod.Convert(_data);
-                result = new ResultData(true);
+                result = ConversionMethod.Convert(_data);
             }
             else
             {

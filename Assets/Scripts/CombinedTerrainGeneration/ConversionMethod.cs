@@ -10,7 +10,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration
     {
         public bool Converted = false;
 
-        public abstract void Convert(Volumetric3 data);
+        public abstract ResultData Convert(Volumetric3 data);
 
         public abstract void Display(HashSet<GameObject> createdObjects, Transform target);
 

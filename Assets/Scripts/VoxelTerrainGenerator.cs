@@ -101,7 +101,7 @@ public class VoxelTerrainGenerator : MonoBehaviour {
 
         //The mesh produced is not optimal. There is one vert for each index.
         //Would need to weld vertices for better quality mesh.
-        marching.Generate(voxels, width, height, length, verts, indices);
+        //marching.Generate(voxels, width, height, length, verts, indices);
 
         //A mesh in unity can only be made up of 65000 verts.
         //Need to split the verts between multiple meshes.
