@@ -7,20 +7,25 @@ using System.Threading.Tasks;
 
 namespace Assets.Scripts.CombinedTerrainGeneration
 {
+    public struct MarchingCubesTaskData
+    {
+        public List<Vector3> Verts;
+        public List<int> Indicies;
+
+        public MarchingCubesTaskData(List<Vector3> verts, List<int> indicies)
+        {
+            Verts = verts;
+            Indicies = indicies;
+        }
+    }
+
     public class MarchingCubesConversion : ConversionMethod
     {
         [Configurable]
         public float Surface = 0f;
         [Configurable]
-        public float PosX = 115;
-        [Configurable]
-        public float PosY = -115;
-        [Configurable]
-        public float PosZ = -115;
-
-        public int ThreadSplit = 4;
-
-        Marching marching = new MarchingCubes();
+        public int ThreadSplit = 3;
+        
         List<Vector3> vertsAll = new List<Vector3>();
         List<int> indicesAll = new List<int>();
 
@@ -35,35 +40,30 @@ namespace Assets.Scripts.CombinedTerrainGeneration
             _width = data.Width;
             _height = data.Height;
 
-            marching.Surface = Surface;
-
             //Calculate segment sizes
             int widthS = _width / ThreadSplit;
-            int depthS = _length / ThreadSplit;
 
             //Store the tasks we create
-            List<Task> segmentTasks = new List<Task>();
-            //Store the returned data from each task instance.
-            List<List<Vector3>> vertsList = new List<List<Vector3>>();
-            List<List<int>> indiciesList = new List<List<int>>();
+            List<Task<MarchingCubesTaskData>> segmentTasks = new List<Task<MarchingCubesTaskData>>();
 
             try
             {
                 for (int i = 1; i <= ThreadSplit; i++)
                 {
                     int widtha = widthS * i;
-                    int deptha = depthS * i;
-                    Vector3Int minRange = new Vector3Int(widtha - widthS, 0, deptha - depthS);
-                    Vector3Int maxRange = new Vector3Int(widtha, _height, deptha);
+                    int minRange = widtha - widthS;
+                    int maxRange = widtha;
 
-                    List<Vector3> verts = new List<Vector3>();
-                    vertsList.Add(verts);
-                    List<int> indices = new List<int>();
-                    indiciesList.Add(indices);
-
-                    Action generateTask = () =>
+                    Func<MarchingCubesTaskData> generateTask = () =>
                     {
+                        List<Vector3> verts = new List<Vector3>();
+                        List<int> indices = new List<int>();
+
+                        Marching marching = new MarchingCubes(Surface);
+
                         marching.Generate(data.Voxels, _width, _height, _length, verts, indices, minRange, maxRange);
+
+                        return new MarchingCubesTaskData(verts, indices);
                     };
                     segmentTasks.Add(Task.Run(generateTask));
                 }
@@ -80,15 +80,15 @@ namespace Assets.Scripts.CombinedTerrainGeneration
                 for (int i = 0; i < segmentTasks.Count; i++)
                 {
                     if (segmentTasks[i].IsCompleted) tasksCompleted++;
-                    if (segmentTasks[i].IsCanceled || segmentTasks[i].IsFaulted) return new ResultData(false, "One or more tasks faulted or got canceled.");
+                    if (segmentTasks[i].IsCanceled || segmentTasks[i].IsFaulted) return new ResultData(false, "One or more tasks faulted.");
                 }
                 if (tasksCompleted >= ThreadSplit) break;
             }
 
             //Combine all lists into one
-            for (int i = 0; i < vertsList.Count; i++)
+            for (int i = 0; i < segmentTasks.Count; i++)
             {
-                vertsAll.AddRange(vertsList[i]);
+                vertsAll.AddRange(segmentTasks[i].Result.Verts);
             }
 
             Converted = true;
@@ -134,7 +134,8 @@ namespace Assets.Scripts.CombinedTerrainGeneration
                 go.GetComponent<MeshFilter>().mesh = mesh;
                 objects.Add(go);
 
-                go.transform.localPosition = new Vector3(PosX, PosY, PosZ);
+                go.transform.localPosition = new Vector3(-_width / 2, -_height / 2, -_length / 2);
+                go.transform.localRotation = Quaternion.Euler(Vector3.zero);
             }
         }
     }

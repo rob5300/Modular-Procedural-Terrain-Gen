@@ -11,7 +11,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration.GenerationMethods
     public class CaveGeneration : GenerationMethod
     {
         [Configurable]
-        public int Radius = 10;
+        public int Radius = 50;
         [Configurable]
         public int Length = 250;
         [Configurable]
@@ -19,21 +19,21 @@ namespace Assets.Scripts.CombinedTerrainGeneration.GenerationMethods
         [Configurable]
         public float BeginXRatio = 0.5f;
         [Configurable]
-        public float BeginZRatio = 0.5f;
+        public float BeginZRatio = 0.4f;
         [Configurable]
         public float DepthRatio = 0.5f;
         [Configurable]
         public bool DepthAboveBase = true;
         [Configurable]
-        public float DivergeX = 0.1f;
+        public float DivergeX = 1.5f;
         [Configurable]
-        public float DivergeY = 0.2f;
+        public float DivergeY = 2.2f;
         [Configurable]
-        public float DivergeZ = 0.3f;
+        public float DivergeZ = 6.6f;
         [Configurable]
         public bool RandomDiverge = true;
         [Configurable]
-        public float RandomConvergeMax = 1f;
+        public float RandomConvergeMax = 10f;
 
         private System.Random _random;
 

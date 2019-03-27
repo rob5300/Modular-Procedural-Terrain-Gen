@@ -15,6 +15,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration
 
         public Text StatusText;
         public Text ResultText;
+        public Text DurationText;
 
         public UnityHelper helper;
         public GeneratorUIManager UIManager;
@@ -25,6 +26,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration
         private Task<ResultData> _generateTask;
 
         private bool _isRunning = false;
+        private float _startTime;
 
         public void Awake()
         {
@@ -50,6 +52,11 @@ namespace Assets.Scripts.CombinedTerrainGeneration
                 ResultData data = _generateTask.Result;
                 ResultText.text = data.Message;
                 _isRunning = false;
+
+                //We are done!
+                float duration = Time.time - _startTime;
+
+                DurationText.text = duration.ToString() + " s";
             }
         }
 
@@ -57,6 +64,11 @@ namespace Assets.Scripts.CombinedTerrainGeneration
         public void Generate()
         {
             if (_isRunning) return;
+
+            CleanOldObjects();
+
+            //Record the start time
+            _startTime = Time.time;
 
             //Get the entered data for each method and attempt to apply the values via reflection
             for (int i = 0; i < _generator.MethodList.Count; i++)

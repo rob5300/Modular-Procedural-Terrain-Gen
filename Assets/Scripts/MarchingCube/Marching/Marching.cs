@@ -25,7 +25,7 @@ namespace MarchingCubesProject
             WindingOrder = new int[] { 0, 1, 2 };
         }
 
-        public virtual void Generate(IList<float> voxels, int width, int height, int depth, IList<Vector3> verts, IList<int> indices, Vector3Int minRange, Vector3Int maxRange)
+        public virtual void Generate(IList<float> voxels, int width, int height, int depth, IList<Vector3> verts, IList<int> indices, int minRange, int maxRange)
         {
 
             if (Surface > 0.0f)
@@ -43,11 +43,11 @@ namespace MarchingCubesProject
 
             int x, y, z, i;
             int ix, iy, iz;
-            for (x = minRange.x; x < maxRange.x - 1; x++)
+            for (x = minRange; x < maxRange; x++)
             {
-                for (y = minRange.y; y < maxRange.y - 1; y++)
+                for (y = 0; y < height - 1; y++)
                 {
-                    for (z = minRange.z; z < maxRange.z - 1; z++)
+                    for (z = 0; z < depth - 1; z++)
                     {
                         //Get the values in the 8 neighbours which make up a cube
                         for (i = 0; i < 8; i++)
