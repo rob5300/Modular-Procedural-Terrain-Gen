@@ -1,12 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Assets.Scripts.CombinedTerrainGeneration;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class MethodBox : MonoBehaviour {
 
     [System.NonSerialized]
-    public int Index;
+    public Method method;
+    [System.NonSerialized]
+    public GenerationInstance GenInstance;
     public Text Title;
     public Transform DataPanel;
     public MethodDataPair DataPairObject;
@@ -32,6 +33,12 @@ public class MethodBox : MonoBehaviour {
             }
             else Fitter.enabled = true;
         }
+    }
+
+    public void RemoveButton()
+    {
+        GenInstance.RemoveMethod(method);
+        Destroy(gameObject);
     }
 
     public void FitContent()

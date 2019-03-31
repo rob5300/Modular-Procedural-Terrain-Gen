@@ -22,7 +22,7 @@ public class GeneratorUIManager : MonoBehaviour {
 
     private List<List<MethodDataPair>> _dataPairs = new List<List<MethodDataPair>>();
     private List<MethodDataPair> _converterDataPairs = new List<MethodDataPair>();
-    private int _currentIndex = 0;
+    public int CurrentIndex = 0;
 
     private int _currentConvertMethodSelected = -1;
     private GameObject _currentConvertMethodBox;
@@ -85,6 +85,12 @@ public class GeneratorUIManager : MonoBehaviour {
         AddNewBox.SetAsLastSibling();
     }
 
+    public void RemoveMethodDataPairs(int index)
+    {
+        _dataPairs.RemoveAt(index);
+        CurrentIndex--;
+    }
+
     public void ConvertMethodChange(int index)
     {
         if(index != _currentConvertMethodSelected)
@@ -103,7 +109,6 @@ public class GeneratorUIManager : MonoBehaviour {
         GameObject newBox = Instantiate(ConversionMethodBoxInstance.gameObject, ConvertMethodContentArea);
         MethodBox box = newBox.GetComponent<MethodBox>();
         box.Title.text = ConversionMethods[index].Name;
-        box.Index = index;
         newBox.SetActive(true);
         _currentConvertMethodBox = box.gameObject;
         MakeDataPairs(ConversionMethods[index], box, true);
@@ -115,10 +120,11 @@ public class GeneratorUIManager : MonoBehaviour {
         GameObject newBox = Instantiate(MethodDataBoxInstance.gameObject, MethodContentArea);
         MethodBox box = newBox.GetComponent<MethodBox>();
         box.Title.text = method.Name;
-        box.Index = _currentIndex;
+        box.GenInstance = GenerationInst;
+        box.method = GenerationInst.GeneratorSys.MethodList[CurrentIndex];
         newBox.SetActive(true);
         MakeDataPairs(method, box);
-        _currentIndex++;
+        CurrentIndex++;
     }
 
     private void MakeDataPairs(Type method, MethodBox box, bool conversionMethod = false)
@@ -133,7 +139,7 @@ public class GeneratorUIManager : MonoBehaviour {
             if (!conversionMethod)
             {
                 _dataPairs.Add(new List<MethodDataPair>());
-                pairs = _dataPairs[_currentIndex];
+                pairs = _dataPairs[CurrentIndex];
             }
             else
             {

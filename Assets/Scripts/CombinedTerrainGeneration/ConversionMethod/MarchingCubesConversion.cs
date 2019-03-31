@@ -40,6 +40,9 @@ namespace Assets.Scripts.CombinedTerrainGeneration
             _width = data.Width;
             _height = data.Height;
 
+            vertsAll.Clear();
+            indicesAll.Clear();
+
             //Calculate segment sizes
             int widthS = _width / ThreadSplit;
 

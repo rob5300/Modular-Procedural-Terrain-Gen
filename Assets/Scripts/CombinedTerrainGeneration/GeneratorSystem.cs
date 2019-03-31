@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Scripts.CombinedTerrainGeneration
@@ -10,6 +11,8 @@ namespace Assets.Scripts.CombinedTerrainGeneration
         public List<GenerationMethod> MethodList;
         public ConversionMethod ConversionMethod;
         public HashSet<GameObject> TerrainObjects;
+
+        public event Action Finished;
 
         public int Length { get; private set; }
         public int Width { get; private set; }
@@ -89,6 +92,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration
                 ConversionMethod.Display(TerrainObjects, _target);
             }
             Status = "Done (Idle)";
+            Finished?.Invoke();
         }
     }
 }

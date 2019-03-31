@@ -21,7 +21,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration
         public GeneratorUIManager UIManager;
         public Transform GenerateTarget;
 
-        private GeneratorSystem _generator;
+        public GeneratorSystem GeneratorSys;
         private GeneratorConfigManager _configManager;
         private Task<ResultData> _generateTask;
 
@@ -30,7 +30,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration
 
         public void Awake()
         {
-            _generator = new GeneratorSystem(helper, Length, Width, Height);
+            GeneratorSys = new GeneratorSystem(helper, Length, Width, Height);
             _configManager = new GeneratorConfigManager();
         }
 
@@ -38,15 +38,24 @@ namespace Assets.Scripts.CombinedTerrainGeneration
         {
             if(method != null)
             {
-                if (method is ConversionMethod) _generator.ConversionMethod = (ConversionMethod)method;
-                else if (method is GenerationMethod) _generator.MethodList.Add((GenerationMethod)method);
+                if (method is ConversionMethod) GeneratorSys.ConversionMethod = (ConversionMethod)method;
+                else if (method is GenerationMethod) GeneratorSys.MethodList.Add((GenerationMethod)method);
                 else ResultText.text = "Method object type is invalid.";
             }
         }
 
+        public void RemoveMethod(Method method)
+        {
+            //Get the index of the method being removed to remove its data pair list aswell.
+            int index = GeneratorSys.MethodList.FindIndex(x => x == method);
+
+            GeneratorSys.MethodList.Remove(method as GenerationMethod);
+            UIManager.RemoveMethodDataPairs(index);
+        }
+
         public void Update()
         {
-            StatusText.text = _generator.Status;
+            StatusText.text = GeneratorSys.Status;
             if (_isRunning && _generateTask.IsCompleted)
             {
                 ResultData data = _generateTask.Result;
@@ -71,14 +80,14 @@ namespace Assets.Scripts.CombinedTerrainGeneration
             _startTime = Time.time;
 
             //Get the entered data for each method and attempt to apply the values via reflection
-            for (int i = 0; i < _generator.MethodList.Count; i++)
+            for (int i = 0; i < GeneratorSys.MethodList.Count; i++)
             {
-                _configManager.ApplyConfigurableValuesTo(_generator.MethodList[i], UIManager.GetDataFromPairs(i));
+                _configManager.ApplyConfigurableValuesTo(GeneratorSys.MethodList[i], UIManager.GetDataFromPairs(i));
             }
             //Get the entered data for the conversion method and also apply that data
-            _configManager.ApplyConfigurableValuesTo(_generator.ConversionMethod, UIManager.GetDataFromPairsOnConversionMethod());
+            _configManager.ApplyConfigurableValuesTo(GeneratorSys.ConversionMethod, UIManager.GetDataFromPairsOnConversionMethod());
 
-            Func<ResultData> generateFunc= () => { return _generator.Generate(GenerateTarget); };
+            Func<ResultData> generateFunc= () => { return GeneratorSys.Generate(GenerateTarget); };
             _generateTask = Task.Run(generateFunc);
             _isRunning = true;
         }
@@ -90,11 +99,11 @@ namespace Assets.Scripts.CombinedTerrainGeneration
 
         private void CleanOldObjects()
         {
-            foreach(GameObject ob in _generator.TerrainObjects)
+            foreach(GameObject ob in GeneratorSys.TerrainObjects)
             {
                 Destroy(ob);
             }
-            _generator.TerrainObjects.Clear();
+            GeneratorSys.TerrainObjects.Clear();
         }
     }
 }
