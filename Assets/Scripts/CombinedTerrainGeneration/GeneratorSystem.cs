@@ -35,7 +35,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration
         public ResultData Generate(Transform target)
         {
             ResultData result;
-            Status = "Generating";
+            Status = "Generating (1/3)";
             _target = target;
 
             //Generate a new set of data.
@@ -44,7 +44,15 @@ namespace Assets.Scripts.CombinedTerrainGeneration
             {
                 foreach(GenerationMethod method in MethodList)
                 {
-                    _data = method.Generate(_data);
+                    try
+                    {
+                        _data = method.Generate(_data);
+                    }
+                    catch (Exception e)
+                    {
+                        Status = "Idle from error.";
+                        return new ResultData(false, e.Message);
+                    }
                 }
                 result = Convert();
                 if (result.Successful)
@@ -66,7 +74,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration
         private ResultData Convert()
         {
             ResultData result;
-            Status = "Converting";
+            Status = "Converting (2/3)";
             if(ConversionMethod != null)
             {
                 result = ConversionMethod.Convert(_data);
@@ -80,7 +88,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration
 
         private ResultData Display()
         {
-            Status = "Displaying";
+            Status = "Displaying (3/3)";
             _helper.UnityTasks.Enqueue(() => { _displayLogic(); });
             return new ResultData(true);
         }

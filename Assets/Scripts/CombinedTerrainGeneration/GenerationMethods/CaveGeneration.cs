@@ -11,7 +11,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration.GenerationMethods
     public class CaveGeneration : GenerationMethod
     {
         [Configurable]
-        public int Radius = 50;
+        public int Radius = 10;
         [Configurable]
         public int Length = 250;
         [Configurable]

@@ -43,7 +43,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration
 
         public bool InBounds(Vector3Int position)
         {
-            if (position.x < 0 || position.y < 0 || position.x < 0 || position.x >= Width || position.y >= Height || position.z >= Length) return false;
+            if (position.x < 0 || position.y < 0 || position.z < 0 || position.x >= Width || position.y >= Height || position.z >= Length) return false;
             return true;
         }
     }
