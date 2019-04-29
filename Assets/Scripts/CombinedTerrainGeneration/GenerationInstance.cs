@@ -16,10 +16,16 @@ namespace Assets.Scripts.CombinedTerrainGeneration
         public Text StatusText;
         public Text ResultText;
         public Text DurationText;
+        public Text totalTimesText;
+        public InputField RepeatAmount;
 
         public UnityHelper helper;
         public GeneratorUIManager UIManager;
         public Transform GenerateTarget;
+
+        private int RepeatCount = 10;
+        private int genCount = 0;
+        private bool repeatGenFinished = false;
 
         public GeneratorSystem GeneratorSys;
         private GeneratorConfigManager _configManager;
@@ -65,7 +71,18 @@ namespace Assets.Scripts.CombinedTerrainGeneration
                 //We are done!
                 float duration = Time.time - _startTime;
 
+                totalTimesText.text += genCount + ": " + duration.ToString() + " s, \n";
+
                 DurationText.text = duration.ToString() + " s";
+            }
+
+            if (repeatGenFinished)
+            {
+                repeatGenFinished = false;
+                if(genCount < RepeatCount)
+                {
+                    GenerateRepeat();
+                }
             }
         }
 
@@ -90,6 +107,20 @@ namespace Assets.Scripts.CombinedTerrainGeneration
             Func<ResultData> generateFunc= () => { return GeneratorSys.Generate(GenerateTarget); };
             _generateTask = Task.Run(generateFunc);
             _isRunning = true;
+        }
+
+        public void StartRepeatGen()
+        {
+            RepeatCount = Convert.ToInt32(RepeatAmount.text);
+            genCount = 0;
+            GenerateRepeat();
+        }
+
+        protected void GenerateRepeat()
+        {
+            Generate();
+            genCount++;
+            GeneratorSys.Finished += () => { repeatGenFinished = true; };
         }
 
         public List<ConfigurableField> GetConfigList(Type type)
