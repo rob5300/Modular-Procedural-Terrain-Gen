@@ -20,6 +20,7 @@ namespace Assets.Scripts.CombinedTerrainGeneration
         public UnityHelper helper;
         public GeneratorUIManager UIManager;
         public Transform GenerateTarget;
+        public Button GenerateButton;
 
         public GeneratorSystem GeneratorSys;
         private GeneratorConfigManager _configManager;
@@ -65,6 +66,8 @@ namespace Assets.Scripts.CombinedTerrainGeneration
                 //We are done!
                 float duration = Time.time - _startTime;
 
+                GenerateButton.interactable = true;
+
                 DurationText.text = duration.ToString() + " s";
             }
         }
@@ -75,6 +78,8 @@ namespace Assets.Scripts.CombinedTerrainGeneration
             if (_isRunning) return;
 
             CleanOldObjects();
+
+            if (GenerateButton != null) GenerateButton.interactable = false;
 
             //Record the start time
             _startTime = Time.time;

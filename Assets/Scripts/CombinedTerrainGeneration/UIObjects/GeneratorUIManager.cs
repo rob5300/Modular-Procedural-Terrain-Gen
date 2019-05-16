@@ -221,4 +221,9 @@ public class GeneratorUIManager : MonoBehaviour {
     {
         _currentConvertMethodBox.GetComponent<MethodBox>().FitContent();
     }
+
+    public void QuitApp()
+    {
+        Application.Quit();
+    }
 }
